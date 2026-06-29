@@ -11,6 +11,7 @@ An **exception** is an unusual condition that happens during program execution �
 > 🔁 **Analogy:** Exceptions are like a fire alarm in a building. Normal program flow = people going about their day. An exception = fire alarm goes off. The program "throws" the alarm, and we "catch" it to handle it safely instead of letting the building burn down (crash).
 
 **Without exception handling — crashes:**
+
 ```cpp
 int a = 10, b = 0;
 int result = a / b;  // crash! program terminates
@@ -18,6 +19,7 @@ cout << result;      // never runs
 ```
 
 **With exception handling — graceful:**
+
 ```cpp
 try {
     int result = a / b;  // might throw
@@ -242,12 +244,12 @@ int square(int n) noexcept {
 
 ## Exception Safety Levels
 
-| Level | Guarantee |
-|-------|-----------|
-| **No-throw** | Function never throws (use `noexcept`) |
-| **Strong** | Either completes fully or throws (no partial change) |
-| **Basic** | No resource leaks, but state may have changed |
-| **No guarantee** | Anything might happen (avoid!) |
+| Level            | Guarantee                                            |
+| ---------------- | ---------------------------------------------------- |
+| **No-throw**     | Function never throws (use `noexcept`)               |
+| **Strong**       | Either completes fully or throws (no partial change) |
+| **Basic**        | No resource leaks, but state may have changed        |
+| **No guarantee** | Anything might happen (avoid!)                       |
 
 ---
 

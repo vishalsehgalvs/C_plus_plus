@@ -11,6 +11,7 @@ Templates let you write **generic** code that works with any data type, without 
 > 🔁 **Analogy:** A template is like a cookie cutter. The cutter's shape works for any type of dough (chocolate, vanilla, gingerbread). You don't need a different cutter for each flavor — just different dough.
 
 **Without templates — repetitive:**
+
 ```cpp
 int addInt(int a, int b)       { return a + b; }
 double addDouble(double a, double b) { return a + b; }
@@ -19,6 +20,7 @@ float addFloat(float a, float b)     { return a + b; }
 ```
 
 **With templates — one function:**
+
 ```cpp
 template <typename T>
 T add(T a, T b) {
