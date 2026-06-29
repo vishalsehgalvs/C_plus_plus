@@ -38,6 +38,7 @@ for (auto &pair : data) {   // instead of: map<string, vector<int>>::iterator
 ```
 
 > ⚠️ Be careful: `auto` can surprise you with const/reference:
+
 ```cpp
 const int x = 5;
 auto y = x;    // y is int (drops const)
@@ -300,6 +301,186 @@ if (result) {
 
 ---
 
+## `constexpr` — Compute at Compile Time
+
+`constexpr` tells the compiler: "compute this at compile time if possible":
+
+```cpp
+// constexpr function — runs at compile time when given constants
+constexpr int factorial(int n) {
+    return n <= 1 ? 1 : n * factorial(n - 1);
+}
+
+constexpr int f5 = factorial(5);   // calculated at compile time: 120
+// No runtime cost at all — compiler just puts 120 in the binary!
+
+// At runtime too (with a non-const arg)
+int n;
+cin >> n;
+cout << factorial(n);   // runs at runtime, still works
+
+// constexpr variables
+constexpr double PI    = 3.14159265358979;
+constexpr int    LIMIT = 100;
+
+// Works in if conditions and array sizes
+int arr[factorial(4)];    // arr[24] — size known at compile time
+```
+
+---
+
+## `if constexpr` — Compile-Time Branching (C++17)
+
+`if constexpr` chooses code paths **at compile time**, not runtime. Unused branches aren't even compiled:
+
+```cpp
+template <typename T>
+void process(T value) {
+    if constexpr (is_integral_v<T>) {
+        cout << "Integer: " << value << " (bit count: " << sizeof(T)*8 << ")" << endl;
+    } else if constexpr (is_floating_point_v<T>) {
+        cout << fixed << setprecision(4);
+        cout << "Float: " << value << endl;
+    } else {
+        cout << "Other: " << value << endl;
+    }
+    // Only the matching branch is compiled for each T
+}
+
+process(42);        // Integer: 42 (bit count: 32)
+process(3.14);      // Float: 3.1400
+process("hello");   // Other: hello
+```
+
+> 💡 With regular `if`, all branches must compile even if never taken. `if constexpr` avoids that — critical for template code where some branches would be compile errors for certain types.
+
+---
+
+## `std::variant` — Type-Safe Union (C++17)
+
+A variable that can hold **one of several types**, but you always know which one it holds:
+
+```cpp
+#include <variant>
+
+variant<int, double, string> v;
+
+v = 42;          // now holds int
+cout << get<int>(v) << endl;    // 42
+
+v = 3.14;        // now holds double
+cout << get<double>(v) << endl; // 3.14
+
+v = "hello";     // now holds string
+cout << get<string>(v) << endl; // hello
+
+// Check what type it holds
+cout << v.index() << endl;      // 2 (index of string in the variant list)
+cout << holds_alternative<string>(v) << endl;  // true
+
+// get_if — safe access (returns pointer, null if wrong type)
+if (auto* s = get_if<string>(&v)) {
+    cout << "String value: " << *s << endl;
+}
+
+// visit — handle all cases (like a switch for types)
+visit([](auto& val) {
+    cout << "Value is: " << val << endl;
+}, v);
+
+// Real-world use: represent a result that's either data or an error
+variant<string, int> result;
+result = "Error: file not found";   // error case
+result = 200;                        // success code
+```
+
+> 💡 `std::variant` replaces the old C-style `union`. Unlike union, it tracks which type is active and won't let you accidentally read the wrong type.
+
+---
+
+## `std::any` — Hold Any Type (C++17)
+
+`std::any` stores a value of **any type** (unlike `variant`, the types don't need to be listed upfront):
+
+```cpp
+#include <any>
+
+any a = 42;
+cout << any_cast<int>(a) << endl;   // 42
+
+a = string("hello");
+cout << any_cast<string>(a) << endl;  // hello
+
+a = 3.14;
+cout << any_cast<double>(a) << endl;  // 3.14
+
+// Check type before casting
+if (a.type() == typeid(double)) {
+    cout << "It's a double: " << any_cast<double>(a) << endl;
+}
+
+// any_cast with pointer — returns null if wrong type (no exception)
+if (auto* p = any_cast<double>(&a)) {
+    cout << *p << endl;
+}
+
+// Heterogeneous container — store different types in one vector
+vector<any> bag = { 1, 2.5, string("hello"), true };
+for (auto& item : bag) {
+    if (item.type() == typeid(int))    cout << "int: "    << any_cast<int>(item) << endl;
+    if (item.type() == typeid(double)) cout << "double: " << any_cast<double>(item) << endl;
+    if (item.type() == typeid(string)) cout << "string: " << any_cast<string>(item) << endl;
+}
+```
+
+> ⚠️ `std::any` is flexible but has runtime overhead and loses type-safety. Prefer `std::variant` when you know the possible types upfront.
+
+---
+
+## Concepts — Template Constraints (C++20)
+
+Concepts let you specify **requirements** for template parameters. No more cryptic 100-line error messages:
+
+```cpp
+#include <concepts>
+
+// Old way: works but gives unreadable errors if T is wrong
+template <typename T>
+T addOld(T a, T b) { return a + b; }
+
+// New way (C++20): requires T to be a number type
+template <typename T>
+requires numeric<T>          // built-in concept
+T addNew(T a, T b) { return a + b; }
+
+// Or inline with 'auto' (cleaner syntax)
+auto multiply(auto a, auto b) requires numeric<decltype(a)> {
+    return a * b;
+}
+
+// Define your own concept
+template <typename T>
+concept Printable = requires(T t) {
+    { cout << t };   // T must be printable with <<
+};
+
+template <Printable T>
+void print(T value) { cout << value << endl; }
+
+print(42);       // OK
+print("hello");  // OK
+// print(vector<int>{});  // ERROR: vector doesn't support << (clear message!)
+
+// Built-in standard concepts (from <concepts>)
+// integral<T>        — T is an integer type
+// floating_point<T>  — T is float/double
+// same_as<T, U>      — T and U are the same type
+// convertible_to<T>  — can convert to T
+// invocable<F, Args> — F is callable with Args
+```
+
+---
+
 ## Key Takeaways
 
 - `auto` deduces types automatically — great for iterators and complex types
@@ -310,3 +491,8 @@ if (result) {
 - `std::move()` transfers ownership/resources without copying
 - Structured bindings `auto [a, b] = pair` — C++17 unpacking syntax
 - `std::optional<T>` — represent a value that may or may not exist (better than returning `-1` or `null`)
+- **`constexpr`** — evaluate at compile time; zero runtime cost for constant inputs
+- **`if constexpr`** (C++17) — compile-time branch selection in templates; unused branches aren't compiled
+- **`std::variant<A,B,C>`** (C++17) — type-safe union; holds exactly one of the listed types
+- **`std::any`** (C++17) — holds any type at runtime; use `variant` when types are known upfront
+- **Concepts** (C++20) — constrain template parameters with readable requirements; gives clear error messages
