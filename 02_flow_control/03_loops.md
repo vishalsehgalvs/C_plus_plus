@@ -11,6 +11,7 @@ Loops let you run the same code multiple times without copy-pasting.
 > 🔁 **Analogy:** Imagine writing "I will not be late" 100 times as punishment. A loop is like a stamp that does it automatically, once per repetition.
 
 C++ has 3 types of loops:
+
 ```
 for loop       → when you know how many times to repeat
 while loop     → when you repeat until a condition changes
@@ -268,12 +269,12 @@ Output:
 
 ## Choosing the Right Loop
 
-| Situation | Use |
-|-----------|-----|
-| Know exact count | `for` |
-| Know stopping condition, check first | `while` |
-| Must run at least once | `do...while` |
-| Iterating over collection | range-based `for` |
+| Situation                            | Use               |
+| ------------------------------------ | ----------------- |
+| Know exact count                     | `for`             |
+| Know stopping condition, check first | `while`           |
+| Must run at least once               | `do...while`      |
+| Iterating over collection            | range-based `for` |
 
 ---
 

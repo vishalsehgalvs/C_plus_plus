@@ -194,13 +194,13 @@ else if (age < 18) cout << "teen";
 else cout << "adult";
 ```
 
-| | `switch` | `if-else if` |
-|--|----------|-------------|
-| Readability (many cases) | ✅ Cleaner | ❌ Long chain |
-| Ranges | ❌ Not possible | ✅ Works |
-| Strings | ❌ Doesn't work (without tricks) | ✅ Works |
-| Enum values | ✅ Perfect | ✅ Works |
-| Performance | ✅ Often faster (jump table) | Depends |
+|                          | `switch`                         | `if-else if`  |
+| ------------------------ | -------------------------------- | ------------- |
+| Readability (many cases) | ✅ Cleaner                       | ❌ Long chain |
+| Ranges                   | ❌ Not possible                  | ✅ Works      |
+| Strings                  | ❌ Doesn't work (without tricks) | ✅ Works      |
+| Enum values              | ✅ Perfect                       | ✅ Works      |
+| Performance              | ✅ Often faster (jump table)     | Depends       |
 
 ---
 
@@ -243,6 +243,57 @@ int main() {
 
 ---
 
+## `[[fallthrough]]` Attribute (C++17)
+
+When you intentionally want fall-through, mark it explicitly so the compiler and readers know it's on purpose:
+
+```cpp
+int day = 3;
+switch (day) {
+    case 1:
+        cout << "Monday";
+        break;
+    case 2:
+        cout << "Tuesday";
+        break;
+    case 3:
+        cout << "Mid-week — Wednesday";
+        [[fallthrough]];     // ✅ explicit: YES, I meant to fall through
+    case 4:
+        cout << " or Thursday — hang in there!" << endl;
+        break;
+    case 5:
+        cout << "Friday!" << endl;
+        break;
+    default:
+        cout << "Weekend!" << endl;
+}
+```
+
+> Without `[[fallthrough]]`, many compilers will warn about the accidental fall-through. This attribute silences the warning AND documents intent to future readers.
+
+---
+
+## Switch with `enum class` (Best Practice)
+
+```cpp
+enum class Direction { NORTH, SOUTH, EAST, WEST };
+
+Direction dir = Direction::NORTH;
+
+switch (dir) {
+    case Direction::NORTH: cout << "Going North"; break;
+    case Direction::SOUTH: cout << "Going South"; break;
+    case Direction::EAST:  cout << "Going East";  break;
+    case Direction::WEST:  cout << "Going West";  break;
+    // no default needed — compiler warns if you forget a case!
+}
+```
+
+> 💡 Pairing `switch` with `enum class` is a powerful pattern. The compiler warns you if you add a new enum value and forget to handle it in the switch — prevents bugs.
+
+---
+
 ## Key Takeaways
 
 - `switch` compares one expression against multiple exact values — cleaner than long `if-else if` chains
@@ -251,3 +302,5 @@ int main() {
 - Fall-through is intentional when you group multiple cases to do the same thing: `case 1: case 2: case 3:`
 - Switch works with `int`, `char`, and `enum` — NOT with `float`, `double`, or `string`
 - Use `if-else` when checking ranges, complex conditions, or strings
+- **`[[fallthrough]]`** (C++17) — marks intentional fall-through explicitly; silences compiler warnings
+- **Pair with `enum class`** — compiler warns if you add a new enum value and forget a case

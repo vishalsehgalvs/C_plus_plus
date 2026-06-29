@@ -160,7 +160,7 @@ switch (choice) {
 
 ## `goto` — Jump Anywhere (Use Sparingly)
 
-`goto` jumps to a **labeled** position in the code. 
+`goto` jumps to a **labeled** position in the code.
 
 > ⚠️ **Avoid `goto`** in modern C++. It makes code hard to follow ("spaghetti code"). There's almost always a better way using loops, break, or functions.
 
