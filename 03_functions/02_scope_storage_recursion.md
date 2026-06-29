@@ -203,13 +203,13 @@ int factIterative(int n) {
 }
 ```
 
-| | Recursion | Iteration |
-|--|-----------|-----------|
-| Readability | ✅ Often cleaner | Depends |
-| Memory | ❌ Uses call stack | ✅ O(1) |
-| Risk | ❌ Stack overflow | Low |
-| Speed | Slower (call overhead) | Faster |
-| Best for | Trees, divide & conquer | Loops with known count |
+|             | Recursion               | Iteration              |
+| ----------- | ----------------------- | ---------------------- |
+| Readability | ✅ Often cleaner        | Depends                |
+| Memory      | ❌ Uses call stack      | ✅ O(1)                |
+| Risk        | ❌ Stack overflow       | Low                    |
+| Speed       | Slower (call overhead)  | Faster                 |
+| Best for    | Trees, divide & conquer | Loops with known count |
 
 > ⚠️ **Stack overflow:** Each recursive call adds to the call stack. Deep recursion (10,000+ levels) will crash your program. Always ensure a base case exists!
 

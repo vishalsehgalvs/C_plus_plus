@@ -11,6 +11,7 @@ A function is a **named, reusable block of code** that performs a specific task.
 > 🔁 **Analogy:** A function is like a recipe. You write the recipe once ("how to make pasta"), then anyone can follow it anytime. You don't rewrite the recipe each time you cook.
 
 **Benefits:**
+
 - **Reusability** — write once, use many times
 - **Readability** — break large programs into small, named pieces
 - **Maintainability** — fix a bug in one place, not everywhere
@@ -157,6 +158,7 @@ greet("Bob", "Hey");       // Hey, Bob!
 ```
 
 > ⚠️ Default arguments must be at the **right side** of the parameter list:
+
 ```cpp
 void f(int a, int b = 5, int c = 10);  // ✅ valid
 void f(int a = 5, int b, int c = 10);  // ❌ error
@@ -247,6 +249,58 @@ main()
 
 ---
 
+## Passing Functions as Arguments (`std::function`)
+
+You can pass behavior — a function — as a parameter. Three ways:
+
+```cpp
+#include <functional>
+
+// 1. std::function — most flexible, works with lambdas, functions, functors
+void applyToAll(vector<int>& v, function<void(int)> action) {
+    for (int x : v) action(x);
+}
+
+vector<int> nums = {1, 2, 3, 4, 5};
+applyToAll(nums, [](int x){ cout << x * 2 << " "; });   // 2 4 6 8 10
+
+// 2. Function pointer — works only for plain functions (no captures)
+bool isEven(int n) { return n % 2 == 0; }
+
+vector<int> filterVec(vector<int> v, bool (*predicate)(int)) {
+    vector<int> result;
+    for (int x : v) if (predicate(x)) result.push_back(x);
+    return result;
+}
+
+auto evens = filterVec(nums, isEven);   // {2, 4}
+
+// 3. Template — fastest, works with anything callable
+template <typename Func>
+void applyFast(vector<int>& v, Func action) {
+    for (int x : v) action(x);
+}
+
+applyFast(nums, [](int x){ cout << x * x << " "; });   // 1 4 9 16 25
+
+// Real-world pattern: callbacks and strategy functions
+struct Config {
+    function<string(string)>   transform = [](string s){ return s; };
+    function<bool(string)>     validate  = [](string s){ return !s.empty(); };
+};
+
+Config cfg;
+cfg.transform = [](string s) {
+    string result = s;
+    for (char& c : result) c = toupper(c);
+    return result;
+};
+
+cout << cfg.transform("hello");  // HELLO
+```
+
+---
+
 ## Key Takeaways
 
 - Functions encapsulate reusable logic — define once, call many times
@@ -258,3 +312,5 @@ main()
 - Default arguments let callers skip optional parameters
 - Function overloading: same name, different parameter types — C++ picks the right one
 - Recursive functions call themselves — always need a base case to stop
+- **`std::function<RetType(Params)>`** — store any callable (lambda, function pointer, functor) as a value
+- **Function pointers** — `RetType (*name)(Params)` — useful for C callbacks; lambdas are usually cleaner
