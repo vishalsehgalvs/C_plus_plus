@@ -88,6 +88,7 @@ cout << *ptr;  // 30
 ```
 
 > 💡 Remember the `*` dual meaning:
+>
 > - In declaration: `int *ptr` → declaring a pointer variable
 > - In expression: `*ptr` → dereferencing (getting the value)
 
@@ -161,14 +162,14 @@ r = y;   // this does NOT rebind r to y — it sets x = 20
 
 ## Pointer vs Reference
 
-| | Pointer | Reference |
-|--|---------|-----------|
-| Syntax | `int *p = &x` | `int &r = x` |
-| Can be null | Yes (`nullptr`) | No — must refer to something |
-| Can be reassigned | Yes (point to different vars) | No — always same var |
-| Must initialize? | No (but should) | Yes — always |
-| Dereference syntax | `*p` | Just use `r` directly |
-| Usage | Dynamic memory, arrays, optional | Function params, aliases |
+|                    | Pointer                          | Reference                    |
+| ------------------ | -------------------------------- | ---------------------------- |
+| Syntax             | `int *p = &x`                    | `int &r = x`                 |
+| Can be null        | Yes (`nullptr`)                  | No — must refer to something |
+| Can be reassigned  | Yes (point to different vars)    | No — always same var         |
+| Must initialize?   | No (but should)                  | Yes — always                 |
+| Dereference syntax | `*p`                             | Just use `r` directly        |
+| Usage              | Dynamic memory, arrays, optional | Function params, aliases     |
 
 ```cpp
 // Both achieve "pass by reference" to a function:
@@ -220,6 +221,7 @@ Stack:     ptr  ──────────────────► Heap: 
 ```
 
 > ⚠️ **Memory leak:** If you `new` without `delete`, the memory is never freed:
+
 ```cpp
 int *p = new int(5);
 // ... forgot to delete p
@@ -253,6 +255,107 @@ ptr->age = 31;       // modify via pointer
 
 ---
 
+## `const` and Pointers — The Tricky Part
+
+The position of `const` relative to `*` completely changes the meaning:
+
+```
+Read the declaration right-to-left:
+
+  const int* p     →  p is a pointer to a const int    (can't change the value)
+  int* const p     →  p is a const pointer to an int   (can't change the address)
+  const int* const p  →  const pointer to const int    (can't change either)
+```
+
+```cpp
+int x = 10, y = 20;
+
+// Pointer to const — data is read-only, pointer can be redirected
+const int* p1 = &x;
+// *p1 = 99;   // ❌ ERROR: can't modify x through p1
+p1 = &y;       // ✅ OK: can point to y instead
+
+// Const pointer — address is fixed, data can be changed
+int* const p2 = &x;
+*p2 = 99;      // ✅ OK: can modify x's value
+// p2 = &y;   // ❌ ERROR: can't redirect p2 to y
+
+// Const pointer to const — nothing can change
+const int* const p3 = &x;
+// *p3 = 99;  // ❌ ERROR
+// p3 = &y;   // ❌ ERROR
+cout << *p3;   // ✅ can only read
+```
+
+> 💡 **Practical rule:** Pass `const Type*` or `const Type&` to functions when you don't need to modify the data. It documents intent and lets the compiler catch mistakes.
+
+---
+
+## Function Pointers
+
+Functions live in memory too — you can store a pointer to them and call them later:
+
+```cpp
+// A function
+int add(int a, int b) { return a + b; }
+int sub(int a, int b) { return a - b; }
+
+// Declare a function pointer: return_type (*name)(param_types)
+int (*operation)(int, int);   // pointer to a function taking two ints, returning int
+
+operation = add;
+cout << operation(3, 4);   // 7
+
+operation = sub;
+cout << operation(3, 4);   // -1
+
+// Useful: pass behavior as a parameter
+void applyAndPrint(int a, int b, int (*func)(int, int)) {
+    cout << func(a, b) << endl;
+}
+
+applyAndPrint(10, 5, add);   // 15
+applyAndPrint(10, 5, sub);   // 5
+
+// Array of function pointers — like a menu
+int multiply(int a, int b) { return a * b; }
+int (*ops[])(int, int) = { add, sub, multiply };
+
+for (auto op : ops) cout << op(6, 3) << " ";  // 9 3 18
+```
+
+> 💡 **Modern alternative:** `std::function<int(int,int)>` and lambdas are more readable for most use cases. Function pointers are mainly used in C APIs and callbacks.
+
+---
+
+## `void*` — Generic Pointer
+
+A `void*` can hold **any** pointer type but you must cast it back before use:
+
+```cpp
+int    n = 42;
+double d = 3.14;
+char   c = 'Z';
+
+void* ptr;
+
+ptr = &n;   // any type works
+cout << *(int*)ptr    << endl;    // 42   (must cast!)
+
+ptr = &d;
+cout << *(double*)ptr << endl;    // 3.14
+
+ptr = &c;
+cout << *(char*)ptr   << endl;    // Z
+
+// Common in C APIs (like memcpy, malloc)
+memcpy(dest, src, size);   // both params are void*
+```
+
+> ⚠️ **Avoid `void*` in modern C++.** Use templates, `std::any`, or proper inheritance. `void*` throws away type safety — a wrong cast is undefined behavior with no error message.
+
+---
+
 ## Key Takeaways
 
 - `&x` gets the **address** of variable `x`
@@ -262,3 +365,6 @@ ptr->age = 31;       // modify via pointer
 - Pointers can be null and reassigned; references cannot
 - `new` allocates on heap; always `delete` (or `delete[]` for arrays) to free memory
 - Use `->` to access struct/class members through a pointer (same as `(*ptr).member`)
+- `const int* p` — pointer to const (data read-only); `int* const p` — const pointer (address fixed)
+- Function pointers store addresses of functions; useful for callbacks and dispatch tables
+- `void*` is a generic pointer — avoid in modern C++, use templates or `std::function` instead
