@@ -36,7 +36,3 @@ int main() {           // main function — entry point
     return 0;          // exit code 0 = success
 }
 ```
-
----
-
-_Notes style: layman human tone · ASCII diagrams · real code examples · analogies · tips & warnings_
