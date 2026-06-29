@@ -76,10 +76,10 @@ int main() {
 ## Access Modifiers in Inheritance
 
 | Member in Base | `public` inheritance | `protected` inheritance | `private` inheritance |
-|---|---|---|---|
-| `public` | public | protected | private |
-| `protected` | protected | protected | private |
-| `private` | ❌ not inherited | ❌ not inherited | ❌ not inherited |
+| -------------- | -------------------- | ----------------------- | --------------------- |
+| `public`       | public               | protected               | private               |
+| `protected`    | protected            | protected               | private               |
+| `private`      | ❌ not inherited     | ❌ not inherited        | ❌ not inherited      |
 
 > 💡 Use `public` inheritance most of the time — it means "Dog IS-A Animal". Use `protected` for "implementation detail" inheritance.
 
@@ -203,6 +203,7 @@ When animals[0]->makeSound() is called:
 ```
 
 > ⚠️ If you DON'T use `virtual`, method overriding won't work with base class pointers/references:
+
 ```cpp
 // Without virtual — calls base class version!
 Animal *a = new Dog();
@@ -297,6 +298,108 @@ delete a;
 
 ---
 
+## Multiple Inheritance
+
+A class can inherit from **more than one base class**:
+
+```cpp
+class Flyable {
+public:
+    void fly() { cout << "Flying!" << endl; }
+};
+
+class Swimmable {
+public:
+    void swim() { cout << "Swimming!" << endl; }
+};
+
+// Duck can do both!
+class Duck : public Flyable, public Swimmable {
+public:
+    void quack() { cout << "Quack!" << endl; }
+};
+
+Duck donald;
+donald.fly();   // from Flyable
+donald.swim();  // from Swimmable
+donald.quack(); // Duck's own
+```
+
+---
+
+## The Diamond Problem and Virtual Inheritance
+
+Multiple inheritance can cause a problem when two base classes share a common ancestor:
+
+```
+        Animal
+       /      \
+    Flyable  Swimmable
+       \      /
+        Duck          ← which 'Animal' does Duck inherit? TWO copies?
+```
+
+```cpp
+// Without virtual: Duck gets TWO copies of Animal — ambiguity!
+class Animal { public: string name = "Animal"; };
+class Flyable : public Animal {};
+class Swimmable : public Animal {};
+class Duck : public Flyable, public Swimmable {};
+
+Duck d;
+// d.name = "duck";       // ❌ ERROR: ambiguous! Which Animal::name?
+// d.Animal::name;         // ❌ still ambiguous
+d.Flyable::name = "duck"; // OK but ugly
+
+// FIX: virtual inheritance — ensures only ONE copy of Animal
+class Flyable    : public virtual Animal {};
+class Swimmable  : public virtual Animal {};
+class Duck       : public Flyable, public Swimmable {};
+
+Duck d2;
+d2.name = "duck";  // ✅ Now only ONE Animal — no ambiguity
+```
+
+> 💡 **In practice:** Multiple inheritance is often a design smell. Prefer composition or interfaces (abstract classes with only pure virtual methods) over deep multiple inheritance hierarchies.
+
+---
+
+## Method Hiding vs Overriding
+
+These two look similar but behave very differently:
+
+```cpp
+class Base {
+public:
+    virtual void speak() { cout << "Base speaks" << endl; }   // virtual
+    void run()           { cout << "Base runs" << endl; }     // NOT virtual
+};
+
+class Derived : public Base {
+public:
+    void speak() override { cout << "Derived speaks" << endl; } // OVERRIDING
+    void run()            { cout << "Derived runs" << endl; }   // HIDING (dangerous!)
+};
+
+Base* ptr = new Derived();
+ptr->speak();    // "Derived speaks"  ✅ virtual dispatch works
+ptr->run();      // "Base runs"       ⚠️ hiding! pointer type decides, not object type
+
+Derived* dptr = new Derived();
+dptr->run();     // "Derived runs"    — now Derived version runs
+```
+
+```
+Overriding (virtual):          Hiding (non-virtual):
+  Pointer type = Base            Pointer type = Base
+  Object type  = Derived         Object type  = Derived
+  Result: Derived's method       Result: BASE's method  ⚠️
+```
+
+> ⚠️ Always use `virtual` + `override` when you intend polymorphism. Hiding non-virtual methods is almost always a bug waiting to happen.
+
+---
+
 ## Key Takeaways
 
 - Inheritance: `class Derived : public Base` — derived class gets all public/protected members
@@ -307,3 +410,6 @@ delete a;
 - Pure virtual functions (`= 0`) make a class abstract — can't instantiate it directly
 - Abstract classes define interfaces that derived classes must implement
 - Always use `virtual` destructor in base class when using polymorphism
+- **Multiple inheritance**: allowed in C++, but use carefully — prefer simple hierarchies
+- **Diamond problem**: use `virtual` inheritance to ensure only one copy of a shared ancestor
+- **Method hiding** (non-virtual): base pointer calls base version even on derived object — usually a bug

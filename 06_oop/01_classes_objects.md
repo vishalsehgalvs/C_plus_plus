@@ -24,6 +24,7 @@
 ```
 
 The four pillars of OOP:
+
 - **Encapsulation** — hide data, expose only what's needed
 - **Inheritance** — create new classes from existing ones
 - **Polymorphism** — same interface, different behaviors
@@ -312,6 +313,216 @@ int main() {
 
 ---
 
+## Copy Constructor and Copy Assignment
+
+When you assign one object to another, C++ needs to know **how** to copy it. By default it does a shallow (memberwise) copy — which breaks if your class owns heap memory:
+
+```
+Shallow copy problem:
+  obj1  ──→  [heap data]  ←──  obj2
+  Both point to SAME memory.
+  When obj1 destroys it, obj2 has a dangling pointer! 💥
+
+Deep copy (correct):
+  obj1  ──→  [heap data]
+  obj2  ──→  [copy of heap data]   ← separate allocation
+```
+
+```cpp
+class Buffer {
+    int*   data;
+    size_t size;
+public:
+    Buffer(size_t s) : size(s), data(new int[s]) {
+        cout << "Constructed" << endl;
+    }
+
+    // Copy constructor — called when: Buffer b2 = b1;  or  Buffer b2(b1);
+    Buffer(const Buffer& other) : size(other.size), data(new int[other.size]) {
+        copy(other.data, other.data + size, data);   // deep copy!
+        cout << "Copied" << endl;
+    }
+
+    // Copy assignment — called when: b2 = b1;  (b2 already exists)
+    Buffer& operator=(const Buffer& other) {
+        if (this == &other) return *this;   // guard: b = b; case
+        delete[] data;                       // free old data
+        size = other.size;
+        data = new int[size];
+        copy(other.data, other.data + size, data);
+        cout << "Copy assigned" << endl;
+        return *this;
+    }
+
+    ~Buffer() { delete[] data; cout << "Destroyed" << endl; }
+};
+```
+
+---
+
+## Move Constructor and Move Assignment
+
+Copying is expensive when dealing with large data. **Move semantics** (C++11) let you _steal_ resources from temporaries instead of copying:
+
+```cpp
+class Buffer {
+    // ... (same as above, plus:)
+
+    // Move constructor — called when object is a temporary/rvalue
+    Buffer(Buffer&& other) noexcept
+        : size(other.size), data(other.data) {
+        other.data = nullptr;   // leave 'other' in empty valid state
+        other.size = 0;
+        cout << "Moved" << endl;
+    }
+
+    // Move assignment
+    Buffer& operator=(Buffer&& other) noexcept {
+        if (this == &other) return *this;
+        delete[] data;
+        size = other.size;
+        data = other.data;
+        other.data = nullptr;
+        other.size = 0;
+        cout << "Move assigned" << endl;
+        return *this;
+    }
+};
+
+// Usage
+Buffer a(100);
+Buffer b = move(a);           // move constructor — no copy!
+vector<Buffer> v;
+v.push_back(Buffer(50));      // move from temporary
+```
+
+### Rule of 0 / 3 / 5
+
+| Rule          | When to use                                               | Special members needed                          |
+| ------------- | --------------------------------------------------------- | ----------------------------------------------- |
+| **Rule of 0** | Class uses only smart pointers/containers (no raw memory) | Don't write any — compiler handles it           |
+| **Rule of 3** | Class manually manages resources (raw `new`/`delete`)     | destructor + copy constructor + copy assignment |
+| **Rule of 5** | Same as Rule of 3 + want move performance                 | All 5: + move constructor + move assignment     |
+
+> 💡 **Best advice:** Design classes to follow **Rule of 0** — use `unique_ptr`/`vector` etc. so you never need to write any of these manually.
+
+---
+
+## Operator Overloading
+
+You can teach C++ how to use `+`, `-`, `<<`, `==` etc. with your own types:
+
+```cpp
+class Vector2D {
+public:
+    double x, y;
+    Vector2D(double x = 0, double y = 0) : x(x), y(y) {}
+
+    // Arithmetic: v1 + v2
+    Vector2D operator+(const Vector2D& other) const {
+        return {x + other.x, y + other.y};
+    }
+
+    // Arithmetic: v1 - v2
+    Vector2D operator-(const Vector2D& other) const {
+        return {x - other.x, y - other.y};
+    }
+
+    // Scalar multiply: v * 3.0
+    Vector2D operator*(double scalar) const {
+        return {x * scalar, y * scalar};
+    }
+
+    // Equality: v1 == v2
+    bool operator==(const Vector2D& other) const {
+        return x == other.x && y == other.y;
+    }
+
+    // Compound assignment: v1 += v2
+    Vector2D& operator+=(const Vector2D& other) {
+        x += other.x; y += other.y; return *this;
+    }
+
+    // Stream output: cout << v
+    // (defined as free function below — needs access to x and y)
+    friend ostream& operator<<(ostream& os, const Vector2D& v) {
+        return os << "(" << v.x << ", " << v.y << ")";
+    }
+};
+
+// Usage
+Vector2D a(1, 2), b(3, 4);
+Vector2D c = a + b;           // (4, 6)
+Vector2D d = c * 2.0;         // (8, 12)
+cout << d << endl;            // (8, 12)
+cout << (a == b) << endl;     // false
+```
+
+> ⚠️ **Don't overload everything.** Only overload operators when the meaning is natural and obvious. Overloading `+` for a money class makes sense. Overloading `*` for a person class does not.
+
+---
+
+## Const Member Functions
+
+A `const` member function promises not to modify the object. It can be called on `const` objects:
+
+```cpp
+class Temperature {
+    double celsius;
+public:
+    Temperature(double c) : celsius(c) {}
+
+    double getCelsius() const {          // const: won't modify anything
+        return celsius;
+    }
+    double getFahrenheit() const {       // const: safe to call on const object
+        return celsius * 9.0/5.0 + 32;
+    }
+    void setCelsius(double c) {          // NOT const: modifies the object
+        celsius = c;
+    }
+};
+
+const Temperature freezing(0.0);
+cout << freezing.getCelsius();    // OK — const function on const object
+// freezing.setCelsius(100);      // ERROR — can't call non-const on const object
+```
+
+> 💡 **Habit:** Mark every getter/read-only method as `const`. The compiler will catch accidental modifications.
+
+---
+
+## Friend Functions and Friend Classes
+
+Sometimes an outside function needs access to private members. `friend` grants it:
+
+```cpp
+class BankAccount {
+    double balance;     // private
+public:
+    BankAccount(double b) : balance(b) {}
+
+    // Transfer needs to access private balance of BOTH accounts
+    friend void transfer(BankAccount& from, BankAccount& to, double amount);
+};
+
+// This free function can access private 'balance'
+void transfer(BankAccount& from, BankAccount& to, double amount) {
+    if (from.balance >= amount) {
+        from.balance -= amount;
+        to.balance   += amount;
+    }
+}
+
+BankAccount alice(1000), bob(500);
+transfer(alice, bob, 200);
+// alice.balance = 800, bob.balance = 700
+```
+
+> ⚠️ **Use sparingly.** `friend` breaks encapsulation. Prefer designing your API so it isn't needed.
+
+---
+
 ## Key Takeaways
 
 - A **class** is a blueprint; an **object** is an instance of that blueprint
@@ -321,3 +532,8 @@ int main() {
 - **Encapsulation**: keep data `private`, provide controlled `public` getters/setters
 - `this` is a pointer to the current object — useful when parameter names clash with member names
 - `static` members belong to the class, not individual objects — shared across all instances
+- **Rule of 0**: let smart pointers/containers handle memory — don't write copy/move/destructor manually
+- **Rule of 3/5**: if you write a destructor (raw memory), also write copy and move operations
+- **Operator overloading**: teach C++ how to use `+`, `==`, `<<` etc. with your types — only when it's natural
+- **`const` member functions**: mark read-only methods as `const` — can be called on const objects
+- **`friend`**: grants outside access to private members — use sparingly
