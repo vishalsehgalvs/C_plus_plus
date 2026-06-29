@@ -242,6 +242,92 @@ binIn.close();
 
 ---
 
+## `<filesystem>` Library (C++17)
+
+Work with files, directories, and paths in a cross-platform way — no more platform-specific hacks:
+
+```cpp
+#include <filesystem>
+namespace fs = filesystem;   // short alias
+
+// ---- Path operations ----
+fs::path p = "C:/Users/Alice/Documents/report.txt";
+
+cout << p.filename();    // report.txt
+cout << p.stem();        // report
+cout << p.extension();   // .txt
+cout << p.parent_path(); // C:/Users/Alice/Documents
+
+// Build paths portably (uses / on Linux, \ on Windows)
+fs::path dir  = "C:/Users/Alice";
+fs::path file = dir / "Documents" / "report.txt";  // combines correctly
+
+// ---- Checking existence ----
+if (fs::exists("myfile.txt"))   cout << "file exists" << endl;
+if (fs::is_directory("mydir"))  cout << "it's a folder" << endl;
+if (fs::is_regular_file("f.txt")) cout << "it's a file" << endl;
+
+// ---- File info ----
+cout << fs::file_size("myfile.txt") << " bytes" << endl;
+
+auto lastWrite = fs::last_write_time("myfile.txt");
+// (convert to time_t for display)
+
+// ---- Directory operations ----
+fs::create_directory("newdir");        // create one folder
+fs::create_directories("a/b/c");       // create nested folders (like mkdir -p)
+fs::remove("oldfile.txt");             // delete file
+fs::remove_all("olddir");              // delete directory recursively
+fs::copy("src.txt", "dst.txt");        // copy file
+fs::rename("old.txt", "new.txt");      // rename/move file
+
+// ---- Listing directory contents ----
+for (const auto& entry : fs::directory_iterator(".")) {
+    cout << entry.path() << " ";
+    if (entry.is_regular_file()) cout << "(" << entry.file_size() << " bytes)";
+    cout << endl;
+}
+
+// Recursive listing (all files in all subdirectories)
+for (const auto& entry : fs::recursive_directory_iterator(".")) {
+    if (entry.is_regular_file()) {
+        cout << entry.path() << endl;
+    }
+}
+```
+
+> ⚠️ Compile flag: `g++ -std=c++17` (and on some Linux distros add `-lstdc++fs`).
+
+---
+
+## Seeking in Files (Random Access)
+
+You don't have to read a file from start to finish. Use `seekg`/`seekp` to jump anywhere:
+
+```cpp
+ifstream file("data.txt");
+
+// seekg = seek for reading (get pointer)
+file.seekg(0, ios::end);          // jump to end
+long size = file.tellg();         // get position = file size
+cout << "File size: " << size << " bytes" << endl;
+
+file.seekg(0, ios::beg);          // jump back to start
+file.seekg(10);                   // jump to byte 10
+file.seekg(5, ios::cur);          // move 5 bytes forward from current position
+file.seekg(-5, ios::end);         // 5 bytes before end
+
+// tellg = tell current read position
+long pos = file.tellg();
+
+// seekp = seek for writing (put pointer, for fstream/ofstream)
+fstream rw("data.bin", ios::in | ios::out | ios::binary);
+rw.seekp(4);                      // go to byte 4 and overwrite
+rw.write(reinterpret_cast<const char*>(&newValue), sizeof(int));
+```
+
+---
+
 ## Key Takeaways
 
 - `ofstream` = write; `ifstream` = read; `fstream` = both
@@ -251,3 +337,6 @@ binIn.close();
 - `getline(file, line)` reads an entire line including spaces
 - Binary mode (`ios::binary`) for reading/writing raw data (structs, numbers as bytes)
 - `seekg(0)` moves read position back to beginning of file
+- **`<filesystem>`** (C++17) — cross-platform path handling, directory listing, file info, create/delete dirs
+- Use `fs::exists()` instead of trying to open and checking failure
+- `seekg`/`seekp` + `tellg`/`tellp` for random access — jump to any position in a file
