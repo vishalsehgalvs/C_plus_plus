@@ -60,6 +60,7 @@ cout << arr[0];   // now 100
 ```
 
 > ⚠️ **Array index out of bounds** is undefined behavior — C++ does NOT check bounds for you!
+
 ```cpp
 int arr[5] = {1, 2, 3, 4, 5};
 cout << arr[10];  // ❌ undefined behavior — could crash, corrupt memory, anything
@@ -223,13 +224,13 @@ v.push_back(5);
 cout << v.size();  // 5
 ```
 
-| | C-style array | `std::array` | `std::vector` |
-|--|--------------|--------------|---------------|
-| Size | Fixed at compile time | Fixed at compile time | Dynamic (can grow) |
-| Size info | No | `arr.size()` | `v.size()` |
-| Bounds check | No | `at()` yes, `[]` no | `at()` yes, `[]` no |
-| Pass to function | Loses size | Passes with size | Passes with size |
-| Overhead | None | Minimal | Small (heap alloc) |
+|                  | C-style array         | `std::array`          | `std::vector`       |
+| ---------------- | --------------------- | --------------------- | ------------------- |
+| Size             | Fixed at compile time | Fixed at compile time | Dynamic (can grow)  |
+| Size info        | No                    | `arr.size()`          | `v.size()`          |
+| Bounds check     | No                    | `at()` yes, `[]` no   | `at()` yes, `[]` no |
+| Pass to function | Loses size            | Passes with size      | Passes with size    |
+| Overhead         | None                  | Minimal               | Small (heap alloc)  |
 
 ---
 

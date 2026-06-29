@@ -8,10 +8,10 @@
 
 C++ has two ways to handle strings:
 
-| Type | Header | Style | Recommended? |
-|------|--------|-------|-------------|
-| C-style string (`char[]`) | `<cstring>` | Old C way | ❌ Avoid |
-| `std::string` | `<string>` | Modern C++ | ✅ Use this |
+| Type                      | Header      | Style      | Recommended? |
+| ------------------------- | ----------- | ---------- | ------------ |
+| C-style string (`char[]`) | `<cstring>` | Old C way  | ❌ Avoid     |
+| `std::string`             | `<string>`  | Modern C++ | ✅ Use this  |
 
 > 🔁 **Analogy:** C-style strings are like manually managing individual letters in boxes. `std::string` is like a smart notepad that manages itself — grows, shrinks, and has built-in tools.
 
@@ -28,11 +28,11 @@ int main() {
     // Create strings
     string name = "Alice";
     string greeting = "Hello, " + name + "!";  // concatenation with +
-    
+
     cout << greeting << endl;       // Hello, Alice!
     cout << name.length() << endl;  // 5
     cout << name.size() << endl;    // 5 (same as length)
-    
+
     return 0;
 }
 ```
@@ -275,6 +275,109 @@ int cmp = strcmp("a", "b"); // compare: negative if a < b
 
 ---
 
+## `std::string_view` — Read Without Copying (C++17)
+
+A `string_view` is a **non-owning view** of a string. It doesn't copy the data — just points at it. Ideal for read-only function parameters:
+
+```cpp
+#include <string_view>
+
+// Old way: copies the whole string every call
+void printOld(string s) { cout << s; }       // makes a copy — expensive
+void printBetter(const string& s) { cout << s; }  // ref, but only works for std::string
+
+// New way: works with string literals, std::string, char arrays — NO copy
+void printFast(string_view sv) { cout << sv; }
+
+string s1 = "hello world";
+printFast(s1);              // from std::string — no copy
+printFast("hello world");   // from string literal — no copy
+
+// Slicing without copying
+string_view sv = "hello world";
+cout << sv.substr(6, 5);    // "world" — no allocation!
+cout << sv.length();        // 11
+cout << sv[0];              // 'h'
+
+// Find
+if (sv.find("world") != string_view::npos) cout << "found!";
+```
+
+> ⚠️ `string_view` doesn't own the data. Make sure the original string outlives the view — don't store a `string_view` to a temporary!
+
+---
+
+## Raw String Literals
+
+Regular strings need escape sequences for backslashes, quotes, newlines. Raw strings let you write them as-is:
+
+```cpp
+// Regular string — backslashes need escaping
+string path1 = "C:\\Users\\Alice\\Documents\\file.txt";
+string regex1 = "\\d+\\.\\d+";
+
+// Raw string: R"(  ...  )"  — everything inside is literal
+string path2  = R"(C:\Users\Alice\Documents\file.txt)";
+string regex2 = R"(\d+\.\d+)";
+
+// Multi-line raw string
+string html = R"(
+    <html>
+      <body>
+        <p>Hello World</p>
+      </body>
+    </html>
+)";
+cout << html;  // prints exactly as written, with newlines
+
+// Custom delimiter if you need ) inside your string
+string tricky = R"xyz(This has ) inside)xyz";  // delimiter is xyz
+```
+
+---
+
+## `std::regex` — Pattern Matching
+
+Find, validate, or extract text using regular expressions:
+
+```cpp
+#include <regex>
+
+string text = "Alice: alice@email.com, Bob: bob@work.org";
+
+// Match — does this whole string match a pattern?
+regex emailPattern(R"([a-zA-Z0-9.]+@[a-zA-Z0-9.]+\.[a-zA-Z]{2,})");
+string email = "test@example.com";
+cout << regex_match(email, emailPattern);  // true
+
+// Search — find first match in string
+smatch match;
+if (regex_search(text, match, emailPattern)) {
+    cout << "First email: " << match[0] << endl;  // alice@email.com
+}
+
+// Find ALL matches
+sregex_iterator it(text.begin(), text.end(), emailPattern);
+sregex_iterator end;
+while (it != end) {
+    cout << (*it)[0] << endl;  // alice@email.com, then bob@work.org
+    ++it;
+}
+
+// Replace — substitute matches
+string result = regex_replace(text, emailPattern, "[HIDDEN]");
+cout << result;  // Alice: [HIDDEN], Bob: [HIDDEN]
+```
+
+> 💡 Common regex patterns:
+>
+> - `\d+` — one or more digits
+> - `[a-zA-Z]+` — one or more letters
+> - `\s+` — whitespace
+> - `^` / `$` — start / end of string
+
+---
+
 ## Key Takeaways
 
 - Always use `std::string` (include `<string>`) — not C-style char arrays
@@ -285,3 +388,6 @@ int cmp = strcmp("a", "b"); // compare: negative if a < b
 - `s[i]` accesses character (no bounds check); `s.at(i)` does bounds check
 - `to_string(num)` converts number to string; `stoi(s)` converts string to int
 - `tolower()`, `toupper()`, `isalpha()`, `isdigit()` for character manipulation (need `<cctype>`)
+- **`string_view`** (C++17) — read-only non-copying view; prefer over `const string&` for parameters
+- **Raw string literals** `R"(...)"` — no escape sequences needed; great for file paths and regex
+- **`std::regex`** — pattern matching, validation, search/replace in strings

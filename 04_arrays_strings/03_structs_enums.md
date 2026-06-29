@@ -11,6 +11,7 @@ A `struct` lets you group **related variables** of different types under one nam
 > 🔁 **Analogy:** A struct is like a form with multiple fields. A "Person" form has fields: name, age, height. Instead of three separate variables, you have one grouped `Person` object.
 
 ### Without struct — messy:
+
 ```cpp
 string name1 = "Alice";   int age1 = 30;
 string name2 = "Bob";     int age2 = 25;
@@ -19,6 +20,7 @@ string name3 = "Charlie"; int age3 = 35;
 ```
 
 ### With struct — clean:
+
 ```cpp
 struct Person {
     string name;
@@ -241,11 +243,11 @@ switch (s) {
 
 In C++, `struct` and `class` are almost identical — the only difference is the default access level:
 
-| | `struct` | `class` |
-|--|---------|---------|
-| Default access | `public` | `private` |
-| Convention | Plain data grouping | OOP with behavior |
-| Inheritance | Supported | Supported |
+|                | `struct`            | `class`           |
+| -------------- | ------------------- | ----------------- |
+| Default access | `public`            | `private`         |
+| Convention     | Plain data grouping | OOP with behavior |
+| Inheritance    | Supported           | Supported         |
 
 ---
 
