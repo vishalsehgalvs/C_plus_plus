@@ -11,6 +11,7 @@ C++ is a **general-purpose programming language** created by Bjarne Stroustrup i
 > 🔁 **Analogy:** If C is a powerful manual car, C++ is the same car but with extra features — automatic gearbox, GPS, cruise control. The engine (performance) is still the same, but you get more tools.
 
 **Where is C++ used?**
+
 - Game engines (Unreal Engine, Unity internals)
 - Operating systems (Windows, Linux parts)
 - Browsers (Chrome, Firefox engines)
@@ -54,6 +55,7 @@ You write code         Compiler            CPU runs
 ## Setting Up C++
 
 ### Option 1: Online Compiler (Easiest — Start Here)
+
 Visit: https://www.programiz.com/cpp-programming/online-compiler/
 
 No installation needed. Just type and run.
@@ -61,6 +63,7 @@ No installation needed. Just type and run.
 ### Option 2: Install a Compiler (Recommended Long-Term)
 
 **Windows:**
+
 ```
 1. Download MinGW from mingw-w64.org (includes g++ compiler)
 2. Add C:\mingw64\bin to your PATH environment variable
@@ -69,18 +72,21 @@ No installation needed. Just type and run.
 ```
 
 **Mac:**
+
 ```bash
 xcode-select --install    # installs clang/g++ compiler
 g++ --version             # verify installation
 ```
 
 **Linux:**
+
 ```bash
 sudo apt install g++      # Ubuntu/Debian
 g++ --version             # verify
 ```
 
 ### Option 3: IDE (All-in-One — Best for Beginners)
+
 - **VS Code** + C++ extension + MinGW
 - **Code::Blocks** (free, beginner-friendly)
 - **CLion** (professional, paid)
@@ -100,6 +106,7 @@ int main() {
 ```
 
 **Output:**
+
 ```
 Hello, World!
 ```
@@ -141,24 +148,24 @@ Hello, World!
 
 ### What g++ flags mean:
 
-| Flag | Meaning |
-|------|---------|
-| `g++ hello.cpp` | compile this file |
-| `-o hello` | name the output "hello" |
-| `-Wall` | show all warnings |
-| `-std=c++17` | use C++17 standard |
+| Flag            | Meaning                 |
+| --------------- | ----------------------- |
+| `g++ hello.cpp` | compile this file       |
+| `-o hello`      | name the output "hello" |
+| `-Wall`         | show all warnings       |
+| `-std=c++17`    | use C++17 standard      |
 
 ---
 
 ## C++ vs Other Languages
 
-| Feature | C++ | Python | JavaScript |
-|---------|-----|--------|-----------|
-| Speed | ⚡ Very fast | 🐢 Slow | 🚶 Medium |
-| Learning curve | 📈 Steep | 📉 Easy | 📊 Medium |
-| Memory control | ✅ Full control | ❌ Managed | ❌ Managed |
-| Use case | Systems, games | Scripts, AI | Web, apps |
-| Compilation | Compiled | Interpreted | JIT compiled |
+| Feature        | C++             | Python      | JavaScript   |
+| -------------- | --------------- | ----------- | ------------ |
+| Speed          | ⚡ Very fast    | 🐢 Slow     | 🚶 Medium    |
+| Learning curve | 📈 Steep        | 📉 Easy     | 📊 Medium    |
+| Memory control | ✅ Full control | ❌ Managed  | ❌ Managed   |
+| Use case       | Systems, games  | Scripts, AI | Web, apps    |
+| Compilation    | Compiled        | Interpreted | JIT compiled |
 
 ---
 

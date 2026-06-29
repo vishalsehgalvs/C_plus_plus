@@ -66,7 +66,7 @@ i = i + 1;  // this comment is noise — the code already says this
 int x = 5;  // again, obvious
 ```
 
-> 💡 **Rule of thumb:** Comment *why* you're doing something, not *what*. The code itself shows *what*. The comment should explain the reasoning.
+> 💡 **Rule of thumb:** Comment _why_ you're doing something, not _what_. The code itself shows _what_. The comment should explain the reasoning.
 
 ### Use comments to disable code during debugging:
 
@@ -171,7 +171,7 @@ int Age = 28;    // yet another different variable!
 
 - `//` is single-line comment; `/* */` is multi-line comment
 - Comments are ignored by the compiler — they're for humans only
-- Comment *why* you're doing something, not *what* (the code shows *what*)
+- Comment _why_ you're doing something, not _what_ (the code shows _what_)
 - Keywords are reserved — you can't use them as variable or function names
 - Common keywords: `int`, `if`, `for`, `while`, `return`, `class`, `new`, `delete`
 - Identifiers (your names) can't start with a digit, can't contain spaces or hyphens, and can't be keywords

@@ -54,6 +54,7 @@ int main() {
 ```
 
 **Output:**
+
 ```
 Age: 25
 Score: 100
@@ -83,12 +84,12 @@ int my age;       // spaces not allowed
 
 ### Naming conventions used in practice:
 
-| Style | Example | Used in |
-|-------|---------|---------|
-| camelCase | `myVariable` | Functions, variables |
+| Style      | Example       | Used in                   |
+| ---------- | ------------- | ------------------------- |
+| camelCase  | `myVariable`  | Functions, variables      |
 | snake_case | `my_variable` | Standard library, C-style |
-| PascalCase | `MyClass` | Classes, structs |
-| UPPER_CASE | `MAX_SIZE` | Constants |
+| PascalCase | `MyClass`     | Classes, structs          |
+| UPPER_CASE | `MAX_SIZE`    | Constants                 |
 
 ---
 
@@ -125,14 +126,14 @@ long double ld = 3.14L; // long double (L suffix)
 
 ### Escape sequences in character/string literals:
 
-| Escape | Meaning |
-|--------|---------|
-| `\n` | newline |
-| `\t` | tab |
-| `\\` | backslash |
-| `\"` | double quote |
-| `\'` | single quote |
-| `\0` | null character |
+| Escape | Meaning        |
+| ------ | -------------- |
+| `\n`   | newline        |
+| `\t`   | tab            |
+| `\\`   | backslash      |
+| `\"`   | double quote   |
+| `\'`   | single quote   |
+| `\0`   | null character |
 
 ```cpp
 cout << "Line 1\nLine 2\n";   // two lines

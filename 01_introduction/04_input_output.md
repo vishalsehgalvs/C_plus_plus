@@ -50,6 +50,7 @@ int main() {
 ```
 
 **Output:**
+
 ```
 Hello
 World
@@ -59,11 +60,11 @@ Name: Alice, Age: 25
 
 ### `\n` vs `endl`
 
-| | `\n` | `endl` |
-|--|------|--------|
-| What it does | Just newline | Newline + flushes buffer |
-| Speed | ⚡ Faster | 🐢 Slightly slower |
-| When to use | Normal output | When you need immediate flush |
+|              | `\n`          | `endl`                        |
+| ------------ | ------------- | ----------------------------- |
+| What it does | Just newline  | Newline + flushes buffer      |
+| Speed        | ⚡ Faster     | 🐢 Slightly slower            |
+| When to use  | Normal output | When you need immediate flush |
 
 > 💡 **Prefer `'\n'`** over `endl` in most cases — `endl` flushes the buffer each time which is slow in loops.
 
@@ -86,6 +87,7 @@ int main() {
 ```
 
 **Session:**
+
 ```
 Enter your age: 25
 You are 25 years old.
@@ -147,11 +149,12 @@ int main() {
 ```
 
 **Output:**
+
 ```
 3.14
 3.1416
      Hello
-Hello     
+Hello
 ********Hi
 ```
 
@@ -204,6 +207,52 @@ int main() {
 
 ---
 
+## `stringstream` — Strings as Streams
+
+Parse or build strings the same way you use `cin`/`cout` — in memory, without the keyboard:
+
+```cpp
+#include <sstream>
+
+// istringstream — read from a string (like cin from a string)
+string data = "Alice 30 5.6";
+istringstream iss(data);
+string name; int age; double height;
+iss >> name >> age >> height;
+cout << name << ", " << age << ", " << height << endl;  // Alice, 30, 5.6
+
+// Parse a line of comma-separated values
+string csvLine = "42,London,true";
+istringstream csv(csvLine);
+string token;
+while (getline(csv, token, ',')) {   // ',' as delimiter
+    cout << token << endl;           // 42 / London / true
+}
+
+// ostringstream — build a string (like cout to a string)
+ostringstream oss;
+oss << "Player: " << name << " | Score: " << 100 << " | Time: " << 3.5 << "s";
+string result = oss.str();   // get the built string
+cout << result << endl;
+
+// stringstream — read AND write
+stringstream ss;
+ss << 42;
+int n;
+ss >> n;   // 42
+
+// Common use: convert types
+string numStr = "12345";
+stringstream converter;
+converter << numStr;
+int converted;
+converter >> converted;   // string → int (alternative to stoi)
+```
+
+> 💡 `istringstream` is the standard way to parse lines token-by-token. Read a whole line with `getline`, then wrap it in `istringstream` to extract individual values.
+
+---
+
 ## Key Takeaways
 
 - `#include <iostream>` is required for input/output
@@ -214,3 +263,4 @@ int main() {
 - `'\n'` is faster than `endl` (no buffer flush); use `endl` when you need immediate output
 - `cerr` is for error messages — separate stream from `cout`
 - `#include <iomanip>` enables formatting: `setw()`, `setprecision()`, `fixed`, `left`, `right`
+- **`stringstream`** — use strings as streams; great for parsing CSV lines or building formatted strings

@@ -29,12 +29,12 @@ Memory layout (typical 64-bit system):
 
 ### Integer Types
 
-| Type | Size | Range |
-|------|------|-------|
-| `short` | 2 bytes | −32,768 to 32,767 |
-| `int` | 4 bytes | −2.1B to 2.1B |
-| `long` | 4 or 8 bytes | platform-dependent |
-| `long long` | 8 bytes | ±9.2 × 10¹⁸ |
+| Type        | Size         | Range              |
+| ----------- | ------------ | ------------------ |
+| `short`     | 2 bytes      | −32,768 to 32,767  |
+| `int`       | 4 bytes      | −2.1B to 2.1B      |
+| `long`      | 4 or 8 bytes | platform-dependent |
+| `long long` | 8 bytes      | ±9.2 × 10¹⁸        |
 
 ```cpp
 short  s  = 32000;
@@ -49,11 +49,11 @@ unsigned long long ull = 18000000000000000000ull;
 
 ### Floating-Point Types
 
-| Type | Size | Precision |
-|------|------|-----------|
-| `float` | 4 bytes | ~7 decimal digits |
-| `double` | 8 bytes | ~15 decimal digits |
-| `long double` | 10–16 bytes | ~18–19 digits |
+| Type          | Size        | Precision          |
+| ------------- | ----------- | ------------------ |
+| `float`       | 4 bytes     | ~7 decimal digits  |
+| `double`      | 8 bytes     | ~15 decimal digits |
+| `long double` | 10–16 bytes | ~18–19 digits      |
 
 ```cpp
 float  f  = 3.14f;         // suffix f for float
@@ -207,6 +207,59 @@ C++ Data Types
 
 ---
 
+## Fixed-Width Integer Types (`<cstdint>`)
+
+The size of `int` can vary across platforms (2 or 4 bytes). If you need **exact sizes**, use fixed-width types:
+
+```cpp
+#include <cstdint>
+
+int8_t  a = 127;        // exactly 8 bits  (signed, -128 to 127)
+uint8_t b = 255;        // exactly 8 bits  (unsigned, 0 to 255)
+int16_t c = 32767;      // exactly 16 bits
+uint16_t d = 65535;     // exactly 16 bits unsigned
+int32_t e = 2147483647; // exactly 32 bits
+uint32_t f = 4294967295U;
+int64_t g = 9223372036854775807LL;  // exactly 64 bits
+uint64_t h = 18446744073709551615ULL;
+
+// Useful for:
+// — Networking / file formats (protocol needs exact bytes)
+// — Embedded systems (fixed-size registers)
+// — Anywhere portability across platforms matters
+cout << sizeof(int32_t);  // always 4, on any platform
+cout << sizeof(int);      // might be 2, 4, or 8 depending on platform!
+```
+
+---
+
+## `std::numeric_limits` — Type Range Info
+
+Don't hardcode `2147483647` — ask C++ what the limits are:
+
+```cpp
+#include <limits>
+
+cout << numeric_limits<int>::min()        << endl;  // -2147483648
+cout << numeric_limits<int>::max()        << endl;  // 2147483647
+cout << numeric_limits<double>::max()     << endl;  // 1.79769e+308
+cout << numeric_limits<double>::epsilon() << endl;  // smallest diff between 1.0 and next
+cout << numeric_limits<float>::infinity() << endl;  // inf
+
+bool isFloat = numeric_limits<float>::is_integer;   // false
+bool isInt   = numeric_limits<int>::is_integer;     // true
+
+// Practical use: initialize min/max trackers
+int smallest = numeric_limits<int>::max();   // start high so anything is smaller
+int largest  = numeric_limits<int>::min();   // start low so anything is larger
+for (int x : {3, 1, 7, 2, 9}) {
+    smallest = min(smallest, x);
+    largest  = max(largest, x);
+}
+```
+
+---
+
 ## Key Takeaways
 
 - Choose the right type for the job: `int` for whole numbers, `double` for decimals, `char` for characters, `bool` for true/false
@@ -216,3 +269,5 @@ C++ Data Types
 - Explicit cast: `static_cast<int>(x)` is the modern C++ way to cast
 - `auto` lets the compiler infer the type — handy but use with care
 - Never use `float` for financial calculations — use `double` or a decimal library
+- **`<cstdint>`**: use `int32_t`, `uint8_t` etc. when you need guaranteed exact sizes across platforms
+- **`std::numeric_limits<T>`**: query min/max/epsilon for any type instead of hardcoding magic numbers

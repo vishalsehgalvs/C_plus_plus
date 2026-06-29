@@ -8,19 +8,19 @@
 
 Operators are symbols that perform operations on **operands** (variables or values).
 
-> 🔁 **Analogy:** Operators are like verbs in a sentence. `a + b` means "add a and b." The operator (`+`) tells C++ *what to do* with the operands (`a` and `b`).
+> 🔁 **Analogy:** Operators are like verbs in a sentence. `a + b` means "add a and b." The operator (`+`) tells C++ _what to do_ with the operands (`a` and `b`).
 
 ---
 
 ## 1. Arithmetic Operators
 
-| Operator | Name | Example | Result |
-|----------|------|---------|--------|
-| `+` | Addition | `5 + 3` | `8` |
-| `-` | Subtraction | `5 - 3` | `2` |
-| `*` | Multiplication | `5 * 3` | `15` |
-| `/` | Division | `5 / 2` | `2` (int!) |
-| `%` | Modulo (remainder) | `5 % 2` | `1` |
+| Operator | Name               | Example | Result     |
+| -------- | ------------------ | ------- | ---------- |
+| `+`      | Addition           | `5 + 3` | `8`        |
+| `-`      | Subtraction        | `5 - 3` | `2`        |
+| `*`      | Multiplication     | `5 * 3` | `15`       |
+| `/`      | Division           | `5 / 2` | `2` (int!) |
+| `%`      | Modulo (remainder) | `5 % 2` | `1`        |
 
 ```cpp
 int a = 10, b = 3;
@@ -104,14 +104,14 @@ cout << a << " " << b << " " << c;  // 7 6 6
 
 These return `true` (1) or `false` (0):
 
-| Operator | Meaning | Example |
-|----------|---------|---------|
-| `==` | Equal to | `5 == 5` → `true` |
-| `!=` | Not equal | `5 != 3` → `true` |
-| `>` | Greater than | `5 > 3` → `true` |
-| `<` | Less than | `5 < 3` → `false` |
-| `>=` | Greater or equal | `5 >= 5` → `true` |
-| `<=` | Less or equal | `3 <= 5` → `true` |
+| Operator | Meaning          | Example           |
+| -------- | ---------------- | ----------------- |
+| `==`     | Equal to         | `5 == 5` → `true` |
+| `!=`     | Not equal        | `5 != 3` → `true` |
+| `>`      | Greater than     | `5 > 3` → `true`  |
+| `<`      | Less than        | `5 < 3` → `false` |
+| `>=`     | Greater or equal | `5 >= 5` → `true` |
+| `<=`     | Less or equal    | `3 <= 5` → `true` |
 
 ```cpp
 int age = 18;
@@ -129,11 +129,11 @@ if (age == 18) { ... }  // ✅ COMPARES correctly
 
 Combine multiple conditions:
 
-| Operator | Name | Example | Meaning |
-|----------|------|---------|---------|
-| `&&` | AND | `a > 0 && b > 0` | Both must be true |
-| `\|\|` | OR | `a > 0 \|\| b > 0` | At least one true |
-| `!` | NOT | `!isLoggedIn` | Flip true/false |
+| Operator | Name | Example            | Meaning           |
+| -------- | ---- | ------------------ | ----------------- |
+| `&&`     | AND  | `a > 0 && b > 0`   | Both must be true |
+| `\|\|`   | OR   | `a > 0 \|\| b > 0` | At least one true |
+| `!`      | NOT  | `!isLoggedIn`      | Flip true/false   |
 
 ```cpp
 int age = 20;
@@ -175,14 +175,14 @@ if (isAdmin() || hasPermission()) {
 
 Operate on individual bits of integers:
 
-| Operator | Name | Example |
-|----------|------|---------|
-| `&` | AND | `5 & 3` = `1` |
-| `\|` | OR | `5 \| 3` = `7` |
-| `^` | XOR | `5 ^ 3` = `6` |
-| `~` | NOT (complement) | `~5` = `-6` |
-| `<<` | Left shift | `5 << 1` = `10` |
-| `>>` | Right shift | `5 >> 1` = `2` |
+| Operator | Name             | Example         |
+| -------- | ---------------- | --------------- |
+| `&`      | AND              | `5 & 3` = `1`   |
+| `\|`     | OR               | `5 \| 3` = `7`  |
+| `^`      | XOR              | `5 ^ 3` = `6`   |
+| `~`      | NOT (complement) | `~5` = `-6`     |
+| `<<`     | Left shift       | `5 << 1` = `10` |
+| `>>`     | Right shift      | `5 >> 1` = `2`  |
 
 ```cpp
 // 5 = 0101, 3 = 0011
